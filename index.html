@@ -18,28 +18,25 @@
   <script type="text/babel" data-presets="react,typescript">
     const { useState, useEffect, Fragment, createContext, useContext } = React;
 
-    // Load App v1.tsx content dynamically
     fetch('App%20v1.tsx')
       .then(res => res.text())
       .then(code => {
-        // Strip out TypeScript type imports/exports that crash browser compilation
+        // Remove import statements that break browser execution
         const cleanCode = code
-          .replace(/import type.*?;/g, '')
-          .replace(/import {.*?} from 'react';?/g, '');
+          .replace(/import\s+.*?from\s+['"].*?['"];?/g, '')
+          .replace(/export\s+default\s+/g, 'window.App = ');
 
+        // Compile TSX/JSX to plain JS
         const compiled = Babel.transform(cleanCode, {
           presets: ['react', 'typescript']
         }).code;
 
-        // Execute the compiled code
-        const exports = {};
-        const module = { exports };
-        const run = new Function('React', 'useState', 'useEffect', 'Fragment', 'createContext', 'useContext', 'exports', 'module', compiled);
-        run(React, useState, useEffect, Fragment, createContext, useContext, exports, module);
+        // Execute the code in scope
+        eval(compiled);
 
-        const App = module.exports.default || window.App;
+        // Render the root React component
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(React.createElement(App));
+        root.render(React.createElement(window.App));
       })
       .catch(err => console.error("Error loading app:", err));
   </script>
