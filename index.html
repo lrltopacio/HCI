@@ -4,23 +4,44 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MotorPH Payroll Wireframe</title>
-  <!-- Tailwind CSS for UI styling -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- React & ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <!-- Babel to compile TSX on the fly -->
+  <!-- Babel Compiler -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-900">
   <div id="root"></div>
 
-  <!-- Load and compile App v1.tsx directly -->
-  <script type="text/babel" data-presets="react,typescript" src="App%20v1.tsx"></script>
   <script type="text/babel" data-presets="react,typescript">
-    import App from './App%20v1.tsx';
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+    const { useState, useEffect, Fragment, createContext, useContext } = React;
+
+    // Load App v1.tsx content dynamically
+    fetch('App%20v1.tsx')
+      .then(res => res.text())
+      .then(code => {
+        // Strip out TypeScript type imports/exports that crash browser compilation
+        const cleanCode = code
+          .replace(/import type.*?;/g, '')
+          .replace(/import {.*?} from 'react';?/g, '');
+
+        const compiled = Babel.transform(cleanCode, {
+          presets: ['react', 'typescript']
+        }).code;
+
+        // Execute the compiled code
+        const exports = {};
+        const module = { exports };
+        const run = new Function('React', 'useState', 'useEffect', 'Fragment', 'createContext', 'useContext', 'exports', 'module', compiled);
+        run(React, useState, useEffect, Fragment, createContext, useContext, exports, module);
+
+        const App = module.exports.default || window.App;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+      })
+      .catch(err => console.error("Error loading app:", err));
   </script>
 </body>
 </html>
