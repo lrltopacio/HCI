@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>HCI TCX File Host</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MotorPH Payroll Wireframe</title>
+  <!-- Tailwind CSS for UI styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel to compile TSX on the fly -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body>
-  <h1>HCI Repository Files</h1>
-  <p>Click below to download or view the TCX file:</p>
-  <a href="App%20v1.tcx" download>Download TCX File</a>
+<body class="bg-slate-50 text-slate-900">
+  <div id="root"></div>
+
+  <!-- Load and compile App v1.tsx directly -->
+  <script type="text/babel" data-presets="react,typescript" src="App%20v1.tsx"></script>
+  <script type="text/babel" data-presets="react,typescript">
+    import App from './App%20v1.tsx';
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
